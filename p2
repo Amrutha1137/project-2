@@ -1,0 +1,59 @@
+#include <iostream>
+#include <queue>
+#include <string>
+using namespace std;
+
+struct Patient {
+    string name;
+    bool critical;
+    int serviceTime;
+};
+
+int main() {
+    queue<Patient> normalQueue;
+    priority_queue<pair<int, Patient>> criticalQueue;
+
+    int choice;
+    while (true) {
+        cout << "\n1. Add Patient\n2. Serve Patient\n3. Show Estimated Wait Time\n4. Exit\nChoice: ";
+        cin >> choice;
+        if (choice == 1) {
+            Patient p;
+            cout << "Enter name: ";
+            cin >> p.name;
+            cout << "Is critical (1-Yes, 0-No): ";
+            cin >> p.critical;
+            cout << "Enter service time (minutes): ";
+            cin >> p.serviceTime;
+            if (p.critical) criticalQueue.push({p.serviceTime, p});
+            else normalQueue.push(p);
+        }
+        else if (choice == 2) {
+            if (!criticalQueue.empty()) {
+                Patient p = criticalQueue.top().second;
+                criticalQueue.pop();
+                cout << "Serving Critical Patient: " << p.name << endl;
+            } else if (!normalQueue.empty()) {
+                Patient p = normalQueue.front();
+                normalQueue.pop();
+                cout << "Serving Normal Patient: " << p.name << endl;
+            } else cout << "No patients in queue\n";
+        }
+        else if (choice == 3) {
+            int total = 0;
+            priority_queue<pair<int, Patient>> tempCritical = criticalQueue;
+            queue<Patient> tempNormal = normalQueue;
+            while (!tempCritical.empty()) {
+                total += tempCritical.top().second.serviceTime;
+                tempCritical.pop();
+            }
+            while (!tempNormal.empty()) {
+                total += tempNormal.front().serviceTime;
+                tempNormal.pop();
+            }
+            cout << "Estimated Wait Time: " << total << " minutes\n";
+        }
+        else break;
+    }
+    return 0;
+}
